@@ -1,15 +1,56 @@
-<% content_for :title, "Showing project" %>
+<div class="max-w-3xl mx-auto mt-10 space-y-8">
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+  <!-- Home Button -->
+  <div>
+    <%= link_to "Back To Projects", root_path, class: "inline-block mb-4 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition" %>
+  </div>
 
-  <h1 class="font-bold text-4xl">Showing project</h1>
+  <!-- Project Name -->
+  <h1 class="text-3xl font-extrabold text-gray-800 border-b pb-2"><%= @project.name %></h1>
 
-  <%= render @project %>
+  <!-- Conversation History -->
+  <div>
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Conversation History</h2>
 
-  <%= link_to "Edit this project", edit_project_path(@project), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to projects", projects_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this project", @project, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <% @project.activities.order(created_at: :asc).each do |activity| %>
+      <div class="p-4 bg-white rounded-lg shadow-sm border hover:shadow-md transition">
+        <p class="text-xs text-gray-400 mb-1">
+          <span class="font-medium text-gray-600"><%= activity.user.name %></span>
+          • <%= time_ago_in_words(activity.created_at) %> ago
+        </p>
+
+        <% if activity.kind == "comment" %>
+          <p class="text-gray-700"><%= simple_format(activity.content) %></p>
+        <% else %>
+          <p class="text-indigo-600 font-medium">
+            changed status to
+            <span class="font-bold text-indigo-700"><%= activity.content.humanize %></span>
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Add a Comment Form -->
+  <div>
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">Add a Comment</h2>
+
+    <%= form_with url: project_activities_path(@project), method: :post, class: "space-y-3" do |f| %>
+      <%= hidden_field_tag :kind, "comment" %>
+      <%= text_area_tag :content, "", placeholder: "Write your comment...", rows: 4, class: "w-full border border-gray-300 rounded-lg p-3 focus:ring focus:ring-blue-200" %>
+      <%= f.submit "Post Comment", class: "px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition" %>
+    <% end %>
+  </div>
+
+  <!-- Change Status Form -->
+  <div>
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">Change Status</h2>
+
+    <%= form_with url: project_activities_path(@project), method: :post, class: "space-y-3" do |f| %>
+      <%= hidden_field_tag :kind, "status_change" %>
+      <%= select_tag :content, options_for_select(Project.statuses.keys.map { |s| [s.humanize, s] }, @project.status), class: "w-full border border-gray-300 rounded-lg p-3 bg-white focus:ring focus:ring-green-200" %>
+      <%= f.submit "Update Status", class: "px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700 transition" %>
+    <% end %>
+  </div>
+
 </div>
