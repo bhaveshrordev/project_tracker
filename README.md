@@ -26,6 +26,22 @@ Users can create projects, track their status, and log activities such as status
 
 ---
 
+---
+
+## Screenshots
+
+### Projects Index
+![Projects Index](app/assets/images/ProjectTracker01.png)
+
+### Recorded Activities on Project
+![Recorded Activities](app/assets/images/ProjectTracker02.png)
+
+### Add Comment on Project
+![Add Comment on Project](app/assets/images/ProjectTracker03.png)
+
+---
+
+
 ## Setup
 
 ### Prerequisites
