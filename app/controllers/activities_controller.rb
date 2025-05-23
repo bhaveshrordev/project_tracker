@@ -1,5 +1,11 @@
 # app/controllers/activities_controller.rb
 class ActivitiesController < ApplicationController
+  
+  def index
+    @project = Project.find(params[:project_id])
+    @activities = @project.activities.order(created_at: :desc)
+  end
+
   def create
     @project = Project.find(params[:project_id])
     @activity = @project.activities.build(
