@@ -6,28 +6,24 @@ class Project < ApplicationRecord
 
   validates :name, presence: true
 
-  after_create :log_creation_activity
-  after_update :log_status_change_activity
+  after_create :log_initial_status
+  after_update :log_status_change, if: :saved_change_to_status?
 
   private
 
-  def log_creation_activity
+  def log_initial_status
+    log_status_activity
+  end
+
+  def log_status_change
+    log_status_activity
+  end
+
+  def log_status_activity
     activities.create!(
       kind: "status_change",
       content: status,
       user: user
     )
   end
-
-  def log_status_change_activity
-    if saved_change_to_status?
-      activities.create!(
-        kind: "status_change",
-        content: status,
-        user: user
-      )
-    end
-  end
 end
-
-  
